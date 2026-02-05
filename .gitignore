@@ -205,3 +205,22 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# GCP credentials — NEVER commit
+*-key.json
+*.json.key
+service-account*.json
+
+# Extraction output
+extraction/sample_output/*.json
+bigquery_metadata.json
+
+# Environment
+.env
+
+# Node
+node_modules/
+package-lock.json
+
+# macOS
+.DS_Store
