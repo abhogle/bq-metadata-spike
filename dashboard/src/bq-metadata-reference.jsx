@@ -293,6 +293,40 @@ const METADATA_FIELDS = [
 
 const TOTAL_FIELDS = METADATA_FIELDS.reduce((sum, cat) => sum + cat.fields.length, 0);
 
+// Export all fields to CSV
+function exportToCSV() {
+  const headers = ["Category", "Field Name", "Type", "Description", "Source"];
+  const rows = [];
+
+  METADATA_FIELDS.forEach(cat => {
+    cat.fields.forEach(field => {
+      rows.push([
+        cat.category,
+        field.name,
+        field.type,
+        // Escape quotes and commas in description
+        `"${(field.description || "").replace(/"/g, '""')}"`,
+        field.source || ""
+      ]);
+    });
+  });
+
+  const csvContent = [
+    headers.join(","),
+    ...rows.map(row => row.join(","))
+  ].join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "bigquery_metadata_reference.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export default function BQMetadataReference() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -327,13 +361,35 @@ export default function BQMetadataReference() {
   return (
     <div style={{ padding: 20, fontFamily: "'IBM Plex Sans', sans-serif" }}>
       {/* Header */}
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: C.text }}>
-          BigQuery Metadata Reference
-        </h2>
-        <p style={{ margin: "8px 0 0 0", color: C.textMuted, fontSize: 13 }}>
-          {TOTAL_FIELDS} metadata fields across {METADATA_FIELDS.length} categories
-        </p>
+      <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: C.text }}>
+            BigQuery Metadata Reference
+          </h2>
+          <p style={{ margin: "8px 0 0 0", color: C.textMuted, fontSize: 13 }}>
+            {TOTAL_FIELDS} metadata fields across {METADATA_FIELDS.length} categories
+          </p>
+        </div>
+        <button
+          onClick={exportToCSV}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 14px",
+            background: C.surface,
+            border: `1px solid ${C.border}`,
+            borderRadius: 6,
+            color: C.text,
+            fontSize: 12,
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+          onMouseOver={(e) => e.currentTarget.style.borderColor = C.accent}
+          onMouseOut={(e) => e.currentTarget.style.borderColor = C.border}
+        >
+          <span>📥</span> Export CSV
+        </button>
       </div>
 
       {/* Search */}

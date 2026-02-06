@@ -350,7 +350,8 @@ function LineageGraph({ highlight, tables, tableLineage }) {
               fontFamily="'JetBrains Mono', monospace"
               dominantBaseline="middle"
             >
-              {p.table.name}
+              <title>{p.table.name}</title>
+              {p.table.name.length > 24 ? p.table.name.slice(0, 22) + "..." : p.table.name}
             </text>
             {p.table.type === "VIEW" && (
               <text
@@ -546,7 +547,7 @@ function OverviewPanel({ data, tables, datasets }) {
       <div style={{ overflowX: "auto" }}>
         <div style={{
           display: "grid",
-          gridTemplateColumns: "90px 130px 55px 180px 65px 65px 45px 35px 65px 65px 60px 50px 60px 65px 75px 75px",
+          gridTemplateColumns: "minmax(70px, 0.8fr) minmax(120px, 1.5fr) 50px minmax(100px, 2fr) 55px 60px 40px 32px minmax(50px, 0.7fr) minmax(55px, 0.7fr) minmax(50px, 0.7fr) 45px 50px minmax(70px, 1fr) 70px 70px",
           gap: 4,
           padding: "8px 10px",
           fontSize: 9,
@@ -555,7 +556,7 @@ function OverviewPanel({ data, tables, datasets }) {
           letterSpacing: "0.05em",
           fontWeight: 600,
           borderBottom: `1px solid ${C.border}`,
-          minWidth: 1400,
+          minWidth: 1100,
         }}>
           <SortableHeader label="Dataset" sortKey="dataset" currentSort={sort} onSort={handleSort} />
           <SortableHeader label="Table Name" sortKey="name" currentSort={sort} onSort={handleSort} />
@@ -578,31 +579,31 @@ function OverviewPanel({ data, tables, datasets }) {
           {filteredTables.map((t, i) => (
             <div key={`${t.dataset}.${t.name}`} style={{
               display: "grid",
-              gridTemplateColumns: "90px 130px 55px 180px 65px 65px 45px 35px 65px 65px 60px 50px 60px 65px 75px 75px",
+              gridTemplateColumns: "minmax(70px, 0.8fr) minmax(120px, 1.5fr) 50px minmax(100px, 2fr) 55px 60px 40px 32px minmax(50px, 0.7fr) minmax(55px, 0.7fr) minmax(50px, 0.7fr) 45px 50px minmax(70px, 1fr) 70px 70px",
               gap: 4,
               padding: "8px 10px",
               background: i % 2 === 0 ? C.surface : "transparent",
               borderRadius: 4,
               alignItems: "center",
               fontSize: 11,
-              minWidth: 1400,
+              minWidth: 1100,
             }}>
               <Badge color={layerColor(t.dataset)} small>{t.dataset.replace("_ecommerce", "")}</Badge>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", color: C.text, fontSize: 10 }}>{t.name}</span>
+              <span title={t.name} style={{ fontFamily: "'JetBrains Mono', monospace", color: C.text, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</span>
               <Badge color={t.type === "VIEW" ? C.reporting : C.analytics} small>{t.type === "VIEW" ? "VIEW" : "TABLE"}</Badge>
-              <span style={{ color: C.textMuted, fontSize: 10 }}>{truncate(t.description, 40)}</span>
+              <span title={t.description} style={{ color: C.textMuted, fontSize: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.description || "-"}</span>
               <span style={{ fontFamily: "monospace", color: C.text, fontSize: 10 }}>{(t.rows || 0).toLocaleString()}</span>
               <span style={{ fontFamily: "monospace", color: C.textMuted, fontSize: 10 }}>{formatBytes(t.bytes || 0)}</span>
               <span style={{ fontFamily: "monospace", color: C.text, fontSize: 10 }}>{t.columns}</span>
               <span>{t.pii ? <Badge color={C.pii} small>Y</Badge> : <span style={{ color: C.textDim }}>-</span>}</span>
-              <span style={{ fontSize: 9, color: C.textDim }}>{t.labels?.owner?.split("-")[0] || "-"}</span>
+              <span title={t.labels?.owner} style={{ fontSize: 9, color: C.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.labels?.owner?.split("-")[0] || "-"}</span>
               <span style={{ fontSize: 9, color: C.textDim }}>{t.labels?.domain || "-"}</span>
               <span style={{ fontSize: 9, color: C.textDim }}>{t.labels?.source || "-"}</span>
               <span>{t.labels?.certified === "true" ? <span style={{ color: "#4ade80" }}>✓</span> : <span style={{ color: C.textDim }}>-</span>}</span>
               <span style={{ fontSize: 9, color: t.partitioning ? C.text : C.textDim }}>
                 {t.partitioning?.type || "-"}
               </span>
-              <span style={{ fontSize: 9, color: t.clustering?.length ? C.text : C.textDim }}>
+              <span title={t.clustering?.join(", ")} style={{ fontSize: 9, color: t.clustering?.length ? C.text : C.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {t.clustering?.length ? t.clustering.slice(0, 2).join(", ") : "-"}
               </span>
               <span style={{ fontSize: 9, color: C.textDim }}>{formatDate(t.created)}</span>
